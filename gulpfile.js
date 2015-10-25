@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var coffee = require('gulp-coffee');
+var browserify = require('gulp-browserify');
 var concat = require('gulp-concat');
 var coffeeSources = [                                    // all coffee sources to be processed
   'components/coffee/tagline.coffee'
@@ -20,5 +21,6 @@ gulp.task('coffee', function() {                          // create a task 'coff
 gulp.task('js', function() {                              // create a task 'js'
   gulp.src(jsSources)                                     // the sources
     .pipe(concat('script.js'))                            // pipe to concat, with output filename
+    .pipe(browserify())                                   // pipe to browserify
     .pipe(gulp.dest('builds/development/js'))             // pipe to dest dir
 });

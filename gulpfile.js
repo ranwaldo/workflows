@@ -41,3 +41,4 @@ gulp.task('compass', function() {                         // create a task 'comp
     .on('error', gutil.log)                               // handle error, log it
     .pipe(gulp.dest('builds/development/css'))            // pipe to output dir
 });
+gulp.task('all', ['coffee','js','compass']);              // create a task 'all', with dependencies

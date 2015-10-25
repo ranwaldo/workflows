@@ -41,9 +41,9 @@ gulp.task('compass', function() {                         // create task 'compas
     .on('error', gutil.log)                               // handle error, log it
     .pipe(gulp.dest('builds/development/css'))            // pipe to output dir
 });
-gulp.task('all', ['coffee','js','compass']);              // create task 'all', with dependencies
 gulp.task('watch', function() {                           // create task 'watch'
   gulp.watch(coffeeSources, ['coffee']);                  // when any coffee file changes, run task 'coffee'
   gulp.watch(jsSources, ['js']);                          // when any js file changes, run task 'js'
   gulp.watch('components/sass/*.scss', ['compass']);      // when any sass file changes, run task 'compass'
 });
+gulp.task('default', ['coffee','js','compass','watch']);  // create task 'default', with dependencies

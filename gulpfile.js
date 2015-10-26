@@ -18,6 +18,12 @@ var jsSources = [                                         // all js files to be 
 var sassSources = [                                       // all sass sources
   'components/sass/style.scss'
 ];
+var htmlSources = [                                       // all html sources
+  'builds/development/*.html'
+];
+var jsonSources = [                                       // all json sources
+  'builds/development/js/*.json'
+];
 
 gulp.task('coffee', function() {                          // create task 'coffee'
   gulp.src(coffeeSources)                                 // the sources
@@ -48,13 +54,24 @@ gulp.task('watch', function() {                           // create task 'watch'
   gulp.watch(coffeeSources, ['coffee']);                  // when any coffee file changes, run task 'coffee'
   gulp.watch(jsSources, ['js']);                          // when any js file changes, run task 'js'
   gulp.watch('components/sass/*.scss', ['compass']);      // when any sass file changes, run task 'compass'
+  gulp.watch(htmlSources, ['html']);                      // when any html file changes, run task 'html'
+  gulp.watch(jsonSources, ['json']);   // when any json file changes, run task 'json'
 });
-gulp.task('default', ['coffee','js','compass','connect','watch']);  // create task 'default', with dependencies
+gulp.task('html', function() {                            // create task 'html'
+  gulp.src(htmlSources)                                   // the sources
+    .pipe(connect.reload())                               // add pipe to reload server
+});
+gulp.task('json', function() {                            // create task 'json'
+  gulp.src(jsonSources)                                   // the sources
+    .pipe(connect.reload())                               // add pipe to reload server
+});
+
+gulp.task('default', ['html','json','coffee','js','compass','connect','watch']);  // create task 'default', with dependencies
 
 gulp.task('connect', function() {                         // create task 'connect'
   connect.server({                                        // call server()
     root: 'builds/development/',                          // document root
-    port: 9000,
+    port: 9000,                                           // set port
     livereload: true                                      // do live reloads
   });
 });

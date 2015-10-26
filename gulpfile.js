@@ -3,6 +3,7 @@ var gutil = require('gulp-util');
 var coffee = require('gulp-coffee');
 var browserify = require('gulp-browserify');
 var compass = require('gulp-compass');
+var connect = require('gulp-connect');
 var concat = require('gulp-concat');
 
 var coffeeSources = [                                     // all coffee sources to be processed
@@ -29,6 +30,7 @@ gulp.task('js', function() {                              // create task 'js'
     .pipe(concat('script.js'))                            // pipe to concat, with output filename
     .pipe(browserify())                                   // pipe to browserify
     .pipe(gulp.dest('builds/development/js'))             // pipe to dest dir
+    .pipe(connect.reload())                               // add pipe to reload server
 });
 gulp.task('compass', function() {                         // create task 'compass'
   gulp.src(sassSources)                                   // input, the sources
@@ -40,10 +42,19 @@ gulp.task('compass', function() {                         // create task 'compas
      )
     .on('error', gutil.log)                               // handle error, log it
     .pipe(gulp.dest('builds/development/css'))            // pipe to output dir
+    .pipe(connect.reload())                               // add pipe to reload server
 });
 gulp.task('watch', function() {                           // create task 'watch'
   gulp.watch(coffeeSources, ['coffee']);                  // when any coffee file changes, run task 'coffee'
   gulp.watch(jsSources, ['js']);                          // when any js file changes, run task 'js'
   gulp.watch('components/sass/*.scss', ['compass']);      // when any sass file changes, run task 'compass'
 });
-gulp.task('default', ['coffee','js','compass','watch']);  // create task 'default', with dependencies
+gulp.task('default', ['coffee','js','compass','connect','watch']);  // create task 'default', with dependencies
+
+gulp.task('connect', function() {                         // create task 'connect'
+  connect.server({                                        // call server()
+    root: 'builds/development/',                          // document root
+    port: 9000,
+    livereload: true                                      // do live reloads
+  });
+});

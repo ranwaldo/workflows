@@ -6,6 +6,7 @@ var compass = require('gulp-compass');
 var connect = require('gulp-connect');
 var gulpif = require('gulp-if');
 var uglify = require('gulp-uglify');
+var minifyHtml = require('gulp-minify-html');
 var concat = require('gulp-concat');
 
 var env, coffeeSources, jsSources, sassSources,           // declare variables
@@ -69,12 +70,14 @@ gulp.task('watch', function() {                           // create task 'watch'
   gulp.watch(coffeeSources, ['coffee']);                  // when any coffee file changes, run task 'coffee'
   gulp.watch(jsSources, ['js']);                          // when any js file changes, run task 'js'
   gulp.watch('components/sass/*.scss', ['compass']);      // when any sass file changes, run task 'compass'
-  gulp.watch(htmlSources, ['html']);                      // when any html file changes, run task 'html'
+  gulp.watch('builds/development/*.html', ['html']);      // when a dev html file changes, run task 'html'
   gulp.watch(jsonSources, ['json']);                      // when any json file changes, run task 'json'
 });
-gulp.task('html', function() {                            // create task 'html'
-  gulp.src(htmlSources)                                   // the sources
-    .pipe(connect.reload())                               // add pipe to reload server
+gulp.task('html', function() {                                 // create task 'html'
+  gulp.src('builds/development/*.html')                        // the dev sources
+    .pipe(gulpif(env === 'production', minifyHtml()))          // only in production, minify
+    .pipe(gulpif(env === 'production', gulp.dest(outputDir)))  // only in production, copy to output dir
+    .pipe(connect.reload())                                    // add pipe to reload server
 });
 gulp.task('json', function() {                            // create task 'json'
   gulp.src(jsonSources)                                   // the sources

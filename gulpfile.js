@@ -8,6 +8,8 @@ var gulpif = require('gulp-if');
 var uglify = require('gulp-uglify');
 var minifyHtml = require('gulp-minify-html');
 var minifyJson = require('gulp-jsonminify');
+var imagemin = require('gulp-imagemin');
+var pngquant = require('imagemin-pngquant');
 var concat = require('gulp-concat');
 
 var env, coffeeSources, jsSources, sassSources,           // declare variables
@@ -73,11 +75,22 @@ gulp.task('watch', function() {                           // create task 'watch'
   gulp.watch('components/sass/*.scss', ['compass']);      // when any sass file changes, run task 'compass'
   gulp.watch('builds/development/*.html', ['html']);      // when a dev html file changes, run task 'html'
   gulp.watch('builds/development/js/*.json', ['json']);   // when a dev json file changes, run task 'json'
+  gulp.watch('builds/development/images/**/*.*', ['images']);  // when a dev images file changes, run task 'images'
 });
 gulp.task('html', function() {                                 // create task 'html'
   gulp.src('builds/development/*.html')                        // the dev sources
     .pipe(gulpif(env === 'production', minifyHtml()))          // only in production, minify
     .pipe(gulpif(env === 'production', gulp.dest(outputDir)))  // only in production, copy to output dir
+    .pipe(connect.reload())                                    // add pipe to reload server
+});
+gulp.task('images', function() {                               // create task 'images'
+  gulp.src('builds/development/images/**/*.*')                 // in dev images, all subdirs
+    .pipe(gulpif(env === 'production', imagemin({              // only in production, minify
+      progressive: true,
+      svgoPlugins: [{removeViewBox: false}],
+      use: [pngquant()]
+    })))                       // only in production, minify
+    .pipe(gulpif(env === 'production', gulp.dest(outputDir + 'images')))  // only in production, copy to output dir
     .pipe(connect.reload())                                    // add pipe to reload server
 });
 gulp.task('json', function() {                                 // create task 'json'
@@ -87,7 +100,7 @@ gulp.task('json', function() {                                 // create task 'j
     .pipe(connect.reload());                                    // add pipe to reload server
 });
 
-gulp.task('default', ['html','json','coffee','js','compass','connect','watch']);  // create task 'default', with dependencies
+gulp.task('default', ['html','json','coffee','js','compass','images','connect','watch']);  // create task 'default', with dependencies
 
 gulp.task('connect', function() {                         // create task 'connect'
   connect.server({                                        // call server()
